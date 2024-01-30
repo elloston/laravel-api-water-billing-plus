@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\WaterRateRequest;
 use App\Models\WaterRate;
 use App\Services\PeriodService;
+use Illuminate\Http\Request;
 
 class WaterRateController extends Controller
 {
@@ -18,9 +19,14 @@ class WaterRateController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(WaterRate::paginate(50));
+        $request->validate(['date' => 'required|date']);
+
+        $period = $this->periodService->findOrCreatePeriod($request->date);
+        $waterRate = WaterRate::where("period_id", $period->id)->firstOrFail();
+
+        return response()->json($waterRate, 200);
     }
 
     /**
@@ -28,7 +34,6 @@ class WaterRateController extends Controller
      */
     public function store(WaterRateRequest $request)
     {
-        // Retrieve the validated input data...
         $validated = $request->validated();
 
         $period = $this->periodService->findOrCreatePeriod($validated['date']);

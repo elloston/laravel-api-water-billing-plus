@@ -22,7 +22,7 @@ class PumpMeterRecordRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'date' => 'required|date|date_format:Y-m-d',
+            'date' => 'required|date',
             'amount_volume' => 'required|integer',
         ];
     }

@@ -16,4 +16,9 @@ class Bill extends Model
         'period_id',
         'amount_rub'
     ];
+
+    public function resident()
+    {
+        return $this->belongsTo(Resident::class);
+    }
 }

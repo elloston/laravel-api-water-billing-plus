@@ -3,27 +3,49 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BillRequest;
+use App\Http\Resources\BillResource;
 use App\Models\Bill;
 use App\Services\BillService;
+use App\Services\PeriodService;
 use Illuminate\Http\Request;
 
 class BillController extends Controller
 {
     protected $billService;
+    protected $periodService;
 
-    public function __construct(BillService $billService)
+    public function __construct(BillService $billService, PeriodService $periodService)
     {
         $this->billService = $billService;
+        $this->periodService = $periodService;
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index(BillRequest $request)
+    public function index(Request $request)
     {
-        $bills = $this->billService->getBillsForDate($request->date);
+        $request->validate(["date" => 'required|date']);
 
-        return response()->json($bills, 200);
+        $sortBy = $request->query('sortBy', 'id');
+        $order = $request->query('order', 'asc') === 'desc' ? 'desc' : 'asc';
+        $perPage = (int) $request->query('perPage', 50);
+
+        $allowedSortColumns = ['id', 'amount_rub'];
+
+        if (!in_array($sortBy, $allowedSortColumns)) {
+            $sortBy = 'id';
+        }
+
+        $period = $this->periodService->findOrCreatePeriod($request->date);
+
+        // Get bills for the specified period
+        $bills = Bill::where('period_id', $period->id)
+            ->orderBy($sortBy, $order)
+            ->paginate($perPage);
+
+
+        return BillResource::collection($bills);
     }
 
     /**
@@ -43,7 +65,7 @@ class BillController extends Controller
      */
     public function show(Bill $bill)
     {
-        return response()->json($bill, 200);
+        return response()->json(new BillResource($bill), 200);
     }
 
     /**

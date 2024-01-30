@@ -4,15 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ResidentRequest;
 use App\Models\Resident;
+use Illuminate\Http\Request;
 
 class ResidentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Resident::paginate(50));
+        $sortBy = $request->query('sortBy', 'id');
+        $order = $request->query('order', 'asc') === 'desc' ? 'desc' : 'asc';
+        $perPage = (int) $request->query('perPage', 50);
+
+        $allowedSortColumns = ['id', 'fio', 'area', 'start_date'];
+        if (!in_array($sortBy, $allowedSortColumns)) {
+            $sortBy = 'id';
+        }
+
+        $residents = Resident::orderBy($sortBy, $order)->paginate($perPage);
+
+        return response()->json($residents, 200);
     }
 
     /**

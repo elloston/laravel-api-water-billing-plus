@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('water_rates', function (Blueprint $table) {
             $table->id();
-            $table->foreign('period_id')->constrained();
-            $table->float('price');
+            $table->foreignId('period_id')->constrained('periods');
+            $table->float('price', 8, 2);
         });
     }
 

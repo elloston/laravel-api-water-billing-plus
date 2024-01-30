@@ -22,7 +22,7 @@ class WaterRateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'date' => 'required|date|date_format:Y-m-d',
+            'date' => 'required|date',
             'price' => 'required|numeric|regex:/^\s*\d+(\.\d{1,2})?\s*$/',
         ];
 

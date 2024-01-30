@@ -17,14 +17,6 @@ class BillService
         $this->periodServices = $periodService;
     }
 
-    public function getBillsForDate($date)
-    {
-        $period = $this->periodServices->findOrCreatePeriod($date);
-
-        // Get bills for the specified period
-        return Bill::where('period_id', $period->id)->paginate(50);
-    }
-
     public function calculateBillsForDate($date)
     {
         $period = $this->periodServices->findOrCreatePeriod($date);

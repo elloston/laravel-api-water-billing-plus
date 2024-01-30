@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PumpMeterRecordRequest;
 use App\Models\PumpMeterRecord;
 use App\Services\PeriodService;
+use Illuminate\Http\Request;
 
 class PumpMeterRecordController extends Controller
 {
@@ -18,9 +19,14 @@ class PumpMeterRecordController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(PumpMeterRecord::paginate(50));
+        $request->validate(['date' => 'required|date']);
+
+        $period = $this->periodService->findOrCreatePeriod($request->date);
+        $meterRecord = PumpMeterRecord::where("period_id", $period->id)->firstOrFail();
+
+        return response()->json($meterRecord, 200);
     }
 
     /**

@@ -24,7 +24,7 @@ class ResidentRequest extends FormRequest
         return [
             'fio' => 'required|string',
             'area' => 'required|integer',
-            'start_date' => 'required|date|date_format:Y-m-d'
+            'start_date' => 'required|date'
         ];
     }
 }
